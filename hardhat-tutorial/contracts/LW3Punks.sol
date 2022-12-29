@@ -77,6 +77,22 @@ contract LW3Punks is ERC721Enumerable, Ownable {
     */
     function setPaused(bool val) public onlyOwner {
         _paused = val;
+    }
+    
+    /**
+    * @dev withdraw sends all the ether in the contract 
+    * to the owner of the contract
+    */
+    function withdraw() public onlyOwner {
+        address _owner = owner();
+        uint256 amount = address(this).balance;
+        (bool sent, ) = _owner.call{value: amount}("");
+        require(sent, "failed to send Ether");
     }   
 
+    // Function to receive Ether. msg.data must be empty
+    receive() external payable {}
+
+    // Fallback function is called when msg.data is not empty
+    fallback() external payable {}
 }
