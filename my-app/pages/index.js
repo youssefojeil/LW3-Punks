@@ -68,6 +68,28 @@ export default function Home() {
   };
 
   /**
+   * getTokenIdsMinted
+   */
+
+  const getTokenIdsMinted = async () => {
+    try {
+      // get provider to read data from contractg
+      const provider = await getProviderOrSigner();
+
+      // get a new instance of contract
+      const nftContract = new Contract(NFT_CONTRACT_ADDRESS, abi, provider);
+
+      // call tokenIds from contract
+      const _tokenIds = await nftContract.tokenIds();
+      console.log("tokenids", _tokenIds);
+      // convert to string and update state
+      setTokenIdsMinted(_tokenIds.toString());
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  /**
    * Returns a Provider or Signer object representing the Ethereum RPC with or without the
    * signing capabilities of metamask attached
    *
