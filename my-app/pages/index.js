@@ -4,6 +4,7 @@ import { Inter } from "@next/font/google";
 import styles from "../styles/Home.module.css";
 import React, { useEffect, useRef, useState } from "react";
 
+import { abi, NFT_CONTRACT_ADDRESS } from "../constants";
 import { Contract, providers, utils } from "ethers";
 import Web3Modal from "web3modal";
 import ConnectToWalletConnect from "web3modal/dist/providers/connectors/walletconnect";
@@ -32,6 +33,35 @@ export default function Home() {
       // When used for the first time, it prompts the user to connect their wall
       await getProviderOrSigner();
       setWalletConnected(true);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  /*
+    publicMint
+  */
+
+  const publicMint = async () => {
+    try {
+      console.log("public Mint");
+
+      // get signer to be able to sign transactions/ write to blockchain
+      const signer = await getProviderOrSigner(true);
+
+      // create an instance of the contract using the address, abi code and signer
+      const nftContract = new Contract(NFT_CONTRACT_ADDRESS, abi, signer);
+
+      // call the mint function and pass 0.01 eth
+      const tx = await nftContract.mint({
+        value: utils.parseEther("0.01"),
+      });
+      // wait for tx to finish
+      setLoading(true);
+      await tx.wait();
+      // on complete set loading to false and alert user that mint is complete
+      setLoading(false);
+      window.alert("You Successfully minted a LW3Punk!");
     } catch (error) {
       console.error(error);
     }
