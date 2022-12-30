@@ -3,11 +3,11 @@ import Image from "next/image";
 import { Inter } from "@next/font/google";
 import styles from "../styles/Home.module.css";
 import React, { useEffect, useRef, useState } from "react";
+import image from "../images/1.png";
 
 import { abi, NFT_CONTRACT_ADDRESS } from "../constants";
 import { Contract, providers, utils } from "ethers";
 import Web3Modal from "web3modal";
-import ConnectToWalletConnect from "web3modal/dist/providers/connectors/walletconnect";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -134,16 +134,63 @@ export default function Home() {
       });
 
       connectWallet();
+      getTokenIdsMinted();
+
+      // set an interval to get the number of token Ids minted every 5 seconds
+      setInterval(async function () {
+        await getTokenIdsMinted();
+      }, 5 * 1000);
     }
   }, [walletConnected]);
 
+  /*
+        renderButton: Returns a button based on the state of the dapp
+  */
+  const renderButton = () => {
+    // If wallet is not connected, return a button which allows them to connect their wallet
+    if (!walletConnected) {
+      return (
+        <button onClick={connectWallet} className={styles.button}>
+          Connect your wallet
+        </button>
+      );
+    }
+
+    // If we are currently waiting for something, return a loading button
+    if (loading) {
+      return <button className={styles.button}>Loading...</button>;
+    }
+
+    return (
+      <button className={styles.button} onClick={publicMint}>
+        Public Mint 🚀
+      </button>
+    );
+  };
+
   return (
-    <>
+    <div>
       <Head>
         <title>LW3Punks</title>
         <meta name="description" content="LW3Punks dApp" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-    </>
+      <div className={styles.main}>
+        <div>
+          <h1 className={styles.title}>Welcome to LW3Punks!</h1>
+          <div className={styles.description}>
+            Its an NFT collection for LearnWeb3 students.
+          </div>
+          <div className={styles.description}>
+            {tokenIdsMinted}/10 have been minted
+          </div>
+          {renderButton()}
+        </div>
+      </div>
+
+      <footer className={styles.footer}>
+        Made with &#10084; by Youssef through LearnWeb3
+      </footer>
+    </div>
   );
 }
